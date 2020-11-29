@@ -84,13 +84,13 @@ user.on('exchangeIceCandidate',function(identity)
 	user.to(identity.peerid).emit('receiveIceCandidate',identity)
 });
 
-user.on('exitRoom',function(identity)
+user.on('peerLeft',function(identity)
 {
+	console.log(identity);
 	user.leave(identity.roomname);
 	if(PeopleInRoom(identity.roomname)==0)
-		myCache.del(identity.roomname)
-	else if(CheckPassword(identity.roomname,identity.roompassword))
-		user.to(identity.roomname).emit('exitRoom');
+		myCache.del(identity.roomname);
+	user.to(identity.roomname).emit('peerLeft',identity);
 });
 
 });
