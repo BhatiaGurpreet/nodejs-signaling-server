@@ -22,12 +22,12 @@ user.on('EnterRoom',function(identity)
 	if(RoomExists(identity.roomname))
 	{
 		var isValidPassword = CheckPassword(identity.roomname,identity.roompassword);
-		var isRoomPack = PeopleInRoom(identity.roomname)==2?true:false;
-		if(isValidPassword&&!isRoomPack)
+		if(isValidPassword)
 		{
 			//Join Room  
 			user.join(identity.roomname);
-			user.emit('initiateCall','msg:start call');
+			console.log('sending initiation to oher members'+user.id);
+			user.to(identity.roomname).emit('initiateCall',user.id);
 		}
 		else
 		{
@@ -74,15 +74,14 @@ user.on('sendDescription',function(identity)
 {
 	//Send this to other person in room
 	if(RoomExists(identity.roomname)&&CheckPassword(identity.roomname,identity.roompassword))
-		user.to(identity.roomname).emit('receiveDescription',identity.description);
+		user.to(identity.peerid).emit('receiveDescription',identity);
 });
 
 user.on('exchangeIceCandidate',function(identity)
 {
 	console.log('ice');
 	if(RoomExists(identity.roomname)&&CheckPassword(identity.roomname,identity.roompassword))
-	user.to(identity.roomname).emit('receiveIceCandidate',identity.ice)
-	console.log('j');
+	user.to(identity.peerid).emit('receiveIceCandidate',identity)
 });
 
 user.on('exitRoom',function(identity)
@@ -90,8 +89,8 @@ user.on('exitRoom',function(identity)
 	user.leave(identity.roomname);
 	if(PeopleInRoom(identity.roomname)==0)
 		myCache.del(identity.roomname)
-	else
-	user.to(identity.roomname).emit('exitRoom');
+	else if(CheckPassword(identity.roomname,identity.roompassword))
+		user.to(identity.roomname).emit('exitRoom');
 });
 
 });
