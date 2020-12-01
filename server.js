@@ -90,7 +90,8 @@ user.on('peerLeft',function(identity)
 	user.leave(identity.roomname);
 	if(PeopleInRoom(identity.roomname)==0)
 		myCache.del(identity.roomname);
-	user.to(identity.roomname).emit('peerLeft',identity);
+	else
+		user.to(identity.roomname).emit('peerLeft',identity);
 });
 
 });
